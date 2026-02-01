@@ -500,9 +500,9 @@ def main():
     
     initialize_defaults()
     
-    st.title("💰 US Retirement Calculator - Needs-Based Withdrawals")
+    st.title("💰 Comprehensive US Retirement Calculator")
     st.markdown("""
-    **Calculates exactly how much you need to withdraw** (not arbitrary 4% rule) to cover expenses, taxes, and Medicare.
+    **Smart Withdrawal Strategy:** Calculates exactly how much you need to withdraw (not arbitrary 4% rule) to cover expenses, taxes, and Medicare.
     Includes 401(k), IRAs, taxable accounts (stocks, bonds, gold), home value, and year-by-year breakdown to age 80.
     
     **Default: 35-year-old professional** | [Click "Clear All Values" to reset]
@@ -762,6 +762,101 @@ def main():
                     else:
                         st.metric("Monthly Shortfall", format_currency(abs(proj['monthly_surplus_shortfall'])),
                                  delta="⚠️ Deficit", delta_color="inverse")
+                
+                # Add detailed breakdown explanation
+                with st.expander("📊 Click to see detailed income & expense breakdown"):
+                    st.markdown(f"""
+                    ### 💰 How Your Money Flows
+                    
+                    #### **INCOME SOURCES (What Comes In):**
+                    
+                    **Retirement Account Withdrawals (Needs-Based):**
+                    - Total Needed from Savings: {format_currency(proj['needed_withdrawal'])}/year
+                    - For Comparison, 4% Rule Would Be: {format_currency(proj['four_percent_withdrawal'])}/year
+                    - **You Save: {format_currency(proj['savings_vs_4pct'])}/year** ✅
+                    
+                    **Guaranteed Income:**
+                    - Pension: {format_currency(proj['pension'] * 12)}/year
+                    - Social Security: {format_currency(proj['social_security'] * 12)}/year
+                    
+                    **Gross Annual Income:** {format_currency(proj['total_annual_income'])} ✅
+                    
+                    ---
+                    
+                    #### **DEDUCTIONS (What Comes Out):**
+                    
+                    **Taxes:**
+                    - Federal & State Taxes: {format_currency(proj['taxes'])}/year
+                    - Effective Tax Rate: {(proj['taxes']/proj['total_annual_income']*100) if proj['total_annual_income'] > 0 else 0:.1f}%
+                    
+                    **Healthcare:**
+                    - Medicare Costs (Part B + D + Out-of-Pocket): {format_currency(proj['medicare_costs'])}/year
+                    - Monthly: {format_currency(proj['medicare_costs']/12)}
+                    
+                    **Total Deductions:** {format_currency(proj['taxes'] + proj['medicare_costs'])} ❌
+                    
+                    ---
+                    
+                    #### **NET INCOME (What You Actually Get):**
+                    
+                    **Calculation:**
+                    ```
+                    Gross Income:        {format_currency(proj['total_annual_income'])}
+                    - Taxes:             {format_currency(proj['taxes'])}
+                    - Medicare:          {format_currency(proj['medicare_costs'])}
+                    ═══════════════════════════════════
+                    Net Annual Income:   {format_currency(proj['net_annual_income'])} ✅
+                    Net Monthly Income:  {format_currency(proj['net_monthly_income'])}
+                    ```
+                    
+                    ---
+                    
+                    #### **EXPENSES (What You Need to Spend):**
+                    
+                    **Your Living Expenses:**
+                    - Original Monthly Expenses: {format_currency(current_monthly_expenses)}
+                    - Inflated to Retirement Age: {format_currency(proj['monthly_retirement_expenses']/(retirement_expense_pct/100))}
+                    - Adjusted for Retirement ({retirement_expense_pct:.0f}%): {format_currency(proj['monthly_retirement_expenses'])}
+                    
+                    **Annual Expenses:** {format_currency(proj['annual_expenses'])}
+                    
+                    *Note: This includes housing, food, transportation, entertainment, etc. 
+                    Medicare is already deducted from income above.*
+                    
+                    ---
+                    
+                    #### **SURPLUS OR SHORTFALL:**
+                    
+                    **The Bottom Line:**
+                    ```
+                    Net Annual Income:   {format_currency(proj['net_annual_income'])}
+                    - Living Expenses:   {format_currency(proj['annual_expenses'])}
+                    ═══════════════════════════════════
+                    Annual Result:       {format_currency(proj['monthly_surplus_shortfall'] * 12)}
+                    Monthly Result:      {format_currency(proj['monthly_surplus_shortfall'])}
+                    ```
+                    
+                    **Coverage Ratio:** {proj['expense_coverage_ratio']:.0f}%
+                    - Above 100% = ✅ Income covers all expenses
+                    - Below 100% = ⚠️ Expenses exceed income
+                    
+                    {'✅ **You have enough income to cover all expenses!**' if proj['monthly_surplus_shortfall'] >= 0 else '⚠️ **Warning: Your expenses exceed your income. Consider adjusting your plan.**'}
+                    
+                    ---
+                    
+                    #### **WHY NEEDS-BASED IS BETTER:**
+                    
+                    **Traditional 4% Rule:**
+                    - Would withdraw: {format_currency(proj['four_percent_withdrawal'])}/year
+                    - Regardless of actual need
+                    - Higher taxes, higher Medicare costs
+                    
+                    **Needs-Based Approach:**
+                    - Withdraws only: {format_currency(proj['needed_withdrawal'])}/year
+                    - Covers exact expenses + taxes + Medicare
+                    - **Saves: {format_currency(proj['savings_vs_4pct'])}/year**
+                    - **Over 18 years: {format_currency(proj['savings_vs_4pct'] * 18)}** stays invested! 🎉
+                    """)
                 
                 st.markdown("---")
             
