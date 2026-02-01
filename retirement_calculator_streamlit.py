@@ -473,27 +473,27 @@ def format_currency(amount: float) -> str:
 
 
 def reset_inputs():
-    """Reset all input values to defaults"""
-    st.session_state.current_age = 45
-    st.session_state.current_401k = 250000.0
-    st.session_state.annual_401k_contribution = 20000.0
-    st.session_state.current_trad_ira = 50000.0
+    """Reset all input values to defaults - Profile: 35-year-old professional"""
+    st.session_state.current_age = 35
+    st.session_state.current_401k = 75000.0
+    st.session_state.annual_401k_contribution = 15000.0
+    st.session_state.current_trad_ira = 15000.0
     st.session_state.annual_trad_ira_contribution = 6500.0
-    st.session_state.current_roth_ira = 30000.0
+    st.session_state.current_roth_ira = 25000.0
     st.session_state.annual_roth_ira_contribution = 6500.0
-    st.session_state.current_taxable = 25000.0
+    st.session_state.current_taxable = 20000.0
     st.session_state.annual_taxable_contribution = 5000.0
     st.session_state.return_rate = 7.0
     st.session_state.full_retirement_age = 67
-    st.session_state.pension_full = 2000.0
-    st.session_state.ss_full = 2500.0
+    st.session_state.pension_full = 1500.0
+    st.session_state.ss_full = 2200.0
     st.session_state.federal_tax = 22
     st.session_state.state_tax = 5.0
     st.session_state.inflation_rate = 3.0
     st.session_state.include_medicare = True
-    st.session_state.current_monthly_expenses = 5000.0
+    st.session_state.current_monthly_expenses = 4500.0
     st.session_state.retirement_expense_pct = 80.0
-    st.session_state.current_home_value = 0.0
+    st.session_state.current_home_value = 350000.0
 
 
 def initialize_defaults():
@@ -511,8 +511,10 @@ def main():
     
     st.title("💰 Comprehensive US Retirement Calculator - Phase 1")
     st.markdown("""
-    Calculate your retirement projections including 401(k), IRAs, taxable accounts, pension, Social Security,
-    taxes, Medicare, monthly expenses, home value, inflation adjustments, and year-by-year breakdown to age 80.
+    Calculate your retirement projections including 401(k), IRAs, taxable accounts (stocks, bonds, gold), pension, 
+    Social Security, taxes, Medicare, monthly expenses, home value, inflation adjustments, and year-by-year breakdown to age 80.
+    
+    **Default profile: 35-year-old professional** (click "Clear All Values" to reset to defaults)
     """)
     
     # Sidebar for inputs
@@ -546,11 +548,13 @@ def main():
         annual_roth_ira_contribution = st.number_input("Annual Roth IRA Contribution ($)", min_value=0.0, 
                                                        step=500.0, key='annual_roth_ira_contribution')
         
-        st.subheader("Taxable Investments")
+        st.subheader("Taxable Investments (Stocks, Bonds, Gold, etc.)")
         current_taxable = st.number_input("Current Taxable Account Balance ($)", min_value=0.0, 
-                                         step=5000.0, key='current_taxable')
+                                         step=5000.0, key='current_taxable',
+                                         help="Brokerage accounts, stocks, bonds, gold, ETFs, mutual funds")
         annual_taxable_contribution = st.number_input("Annual Taxable Contribution ($)", min_value=0.0, 
-                                                      step=500.0, key='annual_taxable_contribution')
+                                                      step=500.0, key='annual_taxable_contribution',
+                                                      help="Additional investments per year")
         
         return_rate = st.slider("Expected Annual Return Rate (%)", min_value=0.0, max_value=15.0, 
                                step=0.5, key='return_rate')
