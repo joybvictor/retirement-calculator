@@ -55,6 +55,55 @@ def get_pension_multiplier(retirement_age: int) -> float:
     return 1.0
 
 
+def calculate_needed_withdrawal(annual_expenses: float, pension_income: float, 
+                               ss_income: float, age: int, federal_rate: float,
+                               state_rate: float, medicare_costs: float,
+                               total_balance: float) -> float:
+    """
+    Calculate how much needs to be withdrawn from retirement accounts to cover expenses.
+    Uses iterative approach since taxes depend on withdrawal amount.
+    """
+    # Start with gap between expenses and guaranteed income
+    guaranteed_income = pension_income + ss_income
+    initial_gap = annual_expenses - guaranteed_income
+    
+    # If guaranteed income covers expenses, no withdrawal needed (unless RMD required)
+    if initial_gap <= 0:
+        # Check RMD
+        rmd = calculate_rmd(total_balance, age)
+        return rmd
+    
+    # Need to withdraw enough to cover:
+    # 1. The expense gap
+    # 2. Taxes on the withdrawal
+    # 3. Medicare costs
+    
+    # Iterative calculation (taxes depend on withdrawal, withdrawal depends on taxes)
+    estimated_withdrawal = initial_gap + medicare_costs
+    
+    for _ in range(5):  # Iterate to converge on correct amount
+        # Calculate taxes on this withdrawal amount
+        # Simplified: assume proportional split between account types
+        test_taxes = calculate_taxes(
+            estimated_withdrawal * 0.6,  # Assume 60% from 401k/IRA
+            estimated_withdrawal * 0.2,  # 20% from Trad IRA  
+            estimated_withdrawal * 0.2,  # 20% from taxable
+            pension_income / 12, ss_income / 12,
+            age, federal_rate, state_rate
+        )
+        
+        # Total need = gap + medicare + taxes
+        total_need = initial_gap + medicare_costs + test_taxes['total_tax']
+        
+        # Update estimate
+        estimated_withdrawal = total_need
+    
+    # Check against RMD
+    rmd = calculate_rmd(total_balance, age)
+    
+    return max(estimated_withdrawal, rmd)
+
+
 def calculate_rmd(balance: float, age: int) -> float:
     """Calculate Required Minimum Distribution"""
     if age < 73:
@@ -604,6 +653,13 @@ def main():
                              step=0.5, key='state_tax')
         
         st.subheader("Planning Assumptions")
+        
+        withdrawal_strategy = st.radio(
+            "Withdrawal Strategy",
+            options=["Needs-Based (Recommended)", "4% Rule (Traditional)"],
+            help="Needs-Based: Withdraw only what you need to cover expenses. 4% Rule: Withdraw 4% annually regardless of need."
+        )
+        
         inflation_rate = st.slider("Expected Inflation Rate (%)", min_value=0.0, max_value=10.0, 
                                   step=0.5, key='inflation_rate')
         include_medicare = st.checkbox("Include Medicare & Healthcare Costs", 
@@ -975,4 +1031,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
