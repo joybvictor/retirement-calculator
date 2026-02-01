@@ -259,29 +259,38 @@ def format_currency(amount: float) -> str:
 
 def reset_inputs():
     """Reset all input values to defaults"""
-    st.session_state['current_age'] = 45
-    st.session_state['current_401k'] = 250000.0
-    st.session_state['annual_401k_contribution'] = 20000.0
-    st.session_state['current_trad_ira'] = 50000.0
-    st.session_state['annual_trad_ira_contribution'] = 6500.0
-    st.session_state['current_roth_ira'] = 30000.0
-    st.session_state['annual_roth_ira_contribution'] = 6500.0
-    st.session_state['current_taxable'] = 25000.0
-    st.session_state['annual_taxable_contribution'] = 5000.0
-    st.session_state['return_rate'] = 7.0
-    st.session_state['full_retirement_age'] = 67
-    st.session_state['pension_full'] = 2000.0
-    st.session_state['ss_full'] = 2500.0
-    st.session_state['federal_tax'] = 22
-    st.session_state['state_tax'] = 5.0
-    st.session_state['inflation_rate'] = 3.0
-    st.session_state['life_expectancy'] = 90
-    st.session_state['include_medicare'] = True
+    st.session_state.current_age = 45
+    st.session_state.current_401k = 250000.0
+    st.session_state.annual_401k_contribution = 20000.0
+    st.session_state.current_trad_ira = 50000.0
+    st.session_state.annual_trad_ira_contribution = 6500.0
+    st.session_state.current_roth_ira = 30000.0
+    st.session_state.annual_roth_ira_contribution = 6500.0
+    st.session_state.current_taxable = 25000.0
+    st.session_state.annual_taxable_contribution = 5000.0
+    st.session_state.return_rate = 7.0
+    st.session_state.full_retirement_age = 67
+    st.session_state.pension_full = 2000.0
+    st.session_state.ss_full = 2500.0
+    st.session_state.federal_tax = 22
+    st.session_state.state_tax = 5.0
+    st.session_state.inflation_rate = 3.0
+    st.session_state.life_expectancy = 90
+    st.session_state.include_medicare = True
+
+
+def initialize_defaults():
+    """Initialize default values if not already set"""
+    if 'current_age' not in st.session_state:
+        reset_inputs()
 
 
 def main():
     """Main Streamlit app"""
     st.set_page_config(page_title="Retirement Calculator", page_icon="💰", layout="wide")
+    
+    # Initialize defaults on first run
+    initialize_defaults()
     
     st.title("💰 Comprehensive Retirement Calculator")
     st.markdown("""
@@ -300,76 +309,60 @@ def main():
     with st.sidebar:
         st.subheader("Basic Information")
         current_age = st.number_input("Current Age", min_value=18, max_value=70, 
-                                     value=st.session_state.get('current_age', 45), 
                                      step=1, key='current_age')
         
         st.subheader("401(k) Account")
         current_401k = st.number_input("Current 401(k) Balance ($)", min_value=0.0, 
-                                      value=st.session_state.get('current_401k', 250000.0), 
                                       step=10000.0, key='current_401k')
         annual_401k_contribution = st.number_input("Annual 401(k) Contribution ($)", min_value=0.0, 
-                                                  value=st.session_state.get('annual_401k_contribution', 20000.0), 
                                                   step=1000.0, key='annual_401k_contribution')
         
         st.subheader("Traditional IRA")
         current_trad_ira = st.number_input("Current Traditional IRA Balance ($)", min_value=0.0, 
-                                          value=st.session_state.get('current_trad_ira', 50000.0), 
                                           step=5000.0, key='current_trad_ira')
         annual_trad_ira_contribution = st.number_input("Annual Traditional IRA Contribution ($)", min_value=0.0, 
-                                                       value=st.session_state.get('annual_trad_ira_contribution', 6500.0), 
                                                        step=500.0, key='annual_trad_ira_contribution')
         
         st.subheader("Roth IRA")
         current_roth_ira = st.number_input("Current Roth IRA Balance ($)", min_value=0.0, 
-                                          value=st.session_state.get('current_roth_ira', 30000.0), 
                                           step=5000.0, key='current_roth_ira')
         annual_roth_ira_contribution = st.number_input("Annual Roth IRA Contribution ($)", min_value=0.0, 
-                                                       value=st.session_state.get('annual_roth_ira_contribution', 6500.0), 
                                                        step=500.0, key='annual_roth_ira_contribution')
         
         st.subheader("Taxable Investments")
         current_taxable = st.number_input("Current Taxable Account Balance ($)", min_value=0.0, 
-                                         value=st.session_state.get('current_taxable', 25000.0), 
                                          step=5000.0, key='current_taxable')
         annual_taxable_contribution = st.number_input("Annual Taxable Contribution ($)", min_value=0.0, 
-                                                      value=st.session_state.get('annual_taxable_contribution', 5000.0), 
                                                       step=500.0, key='annual_taxable_contribution')
         
         return_rate = st.slider("Expected Annual Return Rate (%)", min_value=0.0, max_value=15.0, 
-                               value=st.session_state.get('return_rate', 7.0), 
                                step=0.5, key='return_rate')
         
         st.subheader("Retirement Benefits")
         full_retirement_age = st.selectbox("Full Retirement Age (FRA)", [66, 67], 
-                                          index=1 if st.session_state.get('full_retirement_age', 67) == 67 else 0,
+                                          index=1 if st.session_state.full_retirement_age == 67 else 0,
                                           key='full_retirement_age')
         pension_full = st.number_input("Monthly Pension at Full Retirement ($)", min_value=0.0, 
-                                      value=st.session_state.get('pension_full', 2000.0), 
                                       step=100.0, key='pension_full')
         ss_full = st.number_input("Monthly Social Security at FRA ($)", min_value=0.0, 
-                                 value=st.session_state.get('ss_full', 2500.0), 
                                  step=100.0, key='ss_full')
         
         st.subheader("Tax Information")
         federal_tax = st.selectbox(
             "Federal Marginal Tax Rate (%)",
             [10, 12, 22, 24, 32, 35, 37],
-            index=2 if st.session_state.get('federal_tax', 22) == 22 else 0,
+            index=2 if st.session_state.federal_tax == 22 else 0,
             key='federal_tax'
         )
         state_tax = st.slider("State Tax Rate (%)", min_value=0.0, max_value=15.0, 
-                             value=st.session_state.get('state_tax', 5.0), 
                              step=0.5, key='state_tax')
         
         st.subheader("Planning Assumptions")
         inflation_rate = st.slider("Expected Inflation Rate (%)", min_value=0.0, max_value=10.0, 
-                                  value=st.session_state.get('inflation_rate', 3.0), 
                                   step=0.5, key='inflation_rate')
         life_expectancy = st.number_input("Life Expectancy", min_value=70, max_value=110, 
-                                         value=st.session_state.get('life_expectancy', 90), 
                                          step=1, key='life_expectancy')
         include_medicare = st.checkbox("Include Medicare & Healthcare Costs", 
-                                      value=st.session_state.get('include_medicare', True),
                                       key='include_medicare')
     
     # Main content area
@@ -536,4 +529,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
+
